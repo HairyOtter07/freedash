@@ -1,3 +1,5 @@
 <template>
-  <h1 class="text-3xl font-bold underline">Hello world!</h1>
+  <div class="h-full min-h-screen w-full bg-zinc-900">
+    <WidgetManager />
+  </div>
 </template>
