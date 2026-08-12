@@ -1,5 +1,5 @@
 <template>
-  <div ref="grid" class="grid h-full w-full auto-rows-43.75 grid-cols-8">
+  <div ref="grid" class="grid h-full w-full">
     <WidgetBase
       v-for="widget in widgets"
       :style="`grid-column: ${widget.x} / span ${widget.width}; grid-row: ${widget.y} / span ${widget.height};`"
@@ -7,18 +7,36 @@
   </div>
 </template>
 <script setup>
+const NUM_COLS = 8;
+const GAP = 32;
+const PADDING = 32;
 const grid = ref(null);
-const calcRowHeight = (event) => {
-  grid.value.style = `grid-auto-rows: ${window.innerWidth / 8}px;`;
+
+const debounce = (func, delay) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), delay);
+  };
 };
 
+const calcRowHeight = (event) => {
+  if (!grid.value) return;
+  grid.value.style.gridAutoRows = `${(window.innerWidth - (2 * PADDING + (NUM_COLS - 1) * GAP)) / NUM_COLS}px`;
+};
+
+const debouncedCalcHeight = debounce(calcRowHeight, 50);
+
 onMounted(() => {
+  grid.value.style.gridTemplateColumns = `repeat(${NUM_COLS}, minmax(0, 1fr))`;
+  grid.value.style.gap = `${GAP}px`;
+  grid.value.style.padding = `${PADDING}px`;
   calcRowHeight();
-  window.addEventListener("resize", calcRowHeight);
+  window.addEventListener("resize", debouncedCalcHeight);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("resize", calcRowHeight);
+  window.removeEventListener("resize", debouncedCalcHeight);
 });
 
 const widgets = [
