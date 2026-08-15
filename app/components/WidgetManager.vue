@@ -26,6 +26,7 @@ const shadow = ref(null);
 const cellSize = ref(0);
 const isDragging = ref(false);
 const draggingWidget = ref({});
+const draggingCoords = ref({});
 
 const calcGridCoords = (x, y, maxX, maxY) => {
   let gridX = 0;
@@ -42,7 +43,7 @@ const calcGridCoords = (x, y, maxX, maxY) => {
 };
 
 const onDragStart = (id) => {
-  const widget = widgets.find((el) => el.id == id);
+  const widget = widgets.value.find((el) => el.id == id);
   shadow.value.$el.style.gridColumn = `${widget.position.x} / span ${widget.position.width}`;
   shadow.value.$el.style.gridRow = `${widget.position.y} / span ${widget.position.height}`;
   isDragging.value = true;
@@ -60,10 +61,14 @@ const onDragMove = (event) => {
 
   shadow.value.$el.style.gridColumn = `${gridCoords.x} / span ${draggingWidget.value.position.width}`;
   shadow.value.$el.style.gridRow = `${gridCoords.y} / span ${draggingWidget.value.position.height}`;
+  draggingCoords.value = gridCoords;
 };
 
-const onDragEnd = () => {
+const onDragEnd = (id) => {
   isDragging.value = false;
+  const index = widgets.value.findIndex((el) => el.id == id);
+  widgets.value[index].position.x = draggingCoords.value.x;
+  widgets.value[index].position.y = draggingCoords.value.y;
   document.removeEventListener("mousemove", onDragMove);
 };
 
@@ -96,7 +101,7 @@ onUnmounted(() => {
   window.removeEventListener("resize", debouncedCalcHeight);
 });
 
-const widgets = [
+const widgets = ref([
   {
     id: 1,
     position: {
@@ -133,5 +138,5 @@ const widgets = [
       height: 1,
     },
   },
-];
+]);
 </script>
