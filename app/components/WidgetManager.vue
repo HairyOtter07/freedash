@@ -28,7 +28,7 @@ const isDragging = ref(false);
 const draggingWidget = ref({});
 const draggingCoords = ref({});
 
-const calcGridCoords = (x, y, maxX, maxY) => {
+const calcGridCoords = (x, y, maxX, maxY = Infinity) => {
   let gridX = 0;
   if (x < PADDING) gridX = 1;
   else if (x > maxX - PADDING) gridX = NUM_COLS;
@@ -43,32 +43,28 @@ const calcGridCoords = (x, y, maxX, maxY) => {
 };
 
 const onDragStart = (id) => {
-  const widget = widgets.value.find((el) => el.id == id);
-  shadow.value.$el.style.gridColumn = `${widget.position.x} / span ${widget.position.width}`;
-  shadow.value.$el.style.gridRow = `${widget.position.y} / span ${widget.position.height}`;
+  draggingWidget.value = widgets.value.find((el) => el.id == id);
+  shadow.value.$el.style.gridColumn = `${draggingWidget.value.position.x} / span ${draggingWidget.value.position.width}`;
+  shadow.value.$el.style.gridRow = `${draggingWidget.value.position.y} / span ${draggingWidget.value.position.height}`;
   isDragging.value = true;
-  draggingWidget.value = widget;
   document.addEventListener("mousemove", onDragMove);
 };
 
 const onDragMove = (event) => {
-  const gridCoords = calcGridCoords(
+  draggingCoords.value = calcGridCoords(
     event.pageX,
     event.pageY,
     window.innerWidth,
-    1000,
   );
 
-  shadow.value.$el.style.gridColumn = `${gridCoords.x} / span ${draggingWidget.value.position.width}`;
-  shadow.value.$el.style.gridRow = `${gridCoords.y} / span ${draggingWidget.value.position.height}`;
-  draggingCoords.value = gridCoords;
+  shadow.value.$el.style.gridColumn = `${draggingCoords.value.x} / span ${draggingWidget.value.position.width}`;
+  shadow.value.$el.style.gridRow = `${draggingCoords.value.y} / span ${draggingWidget.value.position.height}`;
 };
 
 const onDragEnd = (id) => {
   isDragging.value = false;
-  const index = widgets.value.findIndex((el) => el.id == id);
-  widgets.value[index].position.x = draggingCoords.value.x;
-  widgets.value[index].position.y = draggingCoords.value.y;
+  draggingWidget.value.position.x = draggingCoords.value.x;
+  draggingWidget.value.position.y = draggingCoords.value.y;
   document.removeEventListener("mousemove", onDragMove);
 };
 
