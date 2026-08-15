@@ -51,6 +51,6 @@ const onMouseUp = (event) => {
 
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
-  emit("dragEnd", props.widgetId);
+  emit("dragEnd");
 };
 </script>

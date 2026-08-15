@@ -61,7 +61,7 @@ const onDragMove = (event) => {
   shadow.value.$el.style.gridRow = `${draggingCoords.value.y} / span ${draggingWidget.value.position.height}`;
 };
 
-const onDragEnd = (id) => {
+const onDragEnd = () => {
   isDragging.value = false;
   draggingWidget.value.position.x = draggingCoords.value.x;
   draggingWidget.value.position.y = draggingCoords.value.y;
