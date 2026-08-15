@@ -22,17 +22,49 @@ const PADDING = 32;
 
 const grid = ref(null);
 const shadow = ref(null);
+
+const cellSize = ref(0);
 const isDragging = ref(false);
+const draggingWidget = ref({});
+
+const calcGridCoords = (x, y, maxX, maxY) => {
+  let gridX = 0;
+  if (x < PADDING) gridX = 1;
+  else if (x > maxX - PADDING) gridX = NUM_COLS;
+  else gridX = Math.floor((x - PADDING) / (cellSize.value + GAP)) + 1;
+
+  let gridY = 0;
+  if (y < PADDING) gridY = 1;
+  else if (y > maxY - PADDING) gridY = NUM_COLS;
+  else gridY = Math.floor((y - PADDING) / (cellSize.value + GAP)) + 1;
+
+  return { x: gridX, y: gridY };
+};
 
 const onDragStart = (id) => {
   const widget = widgets.find((el) => el.id == id);
   shadow.value.$el.style.gridColumn = `${widget.position.x} / span ${widget.position.width}`;
   shadow.value.$el.style.gridRow = `${widget.position.y} / span ${widget.position.height}`;
   isDragging.value = true;
+  draggingWidget.value = widget;
+  document.addEventListener("mousemove", onDragMove);
+};
+
+const onDragMove = (event) => {
+  const gridCoords = calcGridCoords(
+    event.pageX,
+    event.pageY,
+    window.innerWidth,
+    1000,
+  );
+
+  shadow.value.$el.style.gridColumn = `${gridCoords.x} / span ${draggingWidget.value.position.width}`;
+  shadow.value.$el.style.gridRow = `${gridCoords.y} / span ${draggingWidget.value.position.height}`;
 };
 
 const onDragEnd = () => {
   isDragging.value = false;
+  document.removeEventListener("mousemove", onDragMove);
 };
 
 const debounce = (func, delay) => {
@@ -45,7 +77,9 @@ const debounce = (func, delay) => {
 
 const calcRowHeight = (event) => {
   if (!grid.value) return;
-  grid.value.style.gridAutoRows = `${(window.innerWidth - (2 * PADDING + (NUM_COLS - 1) * GAP)) / NUM_COLS}px`;
+  cellSize.value =
+    (window.innerWidth - (2 * PADDING + (NUM_COLS - 1) * GAP)) / NUM_COLS;
+  grid.value.style.gridAutoRows = `${cellSize.value}px`;
 };
 
 const debouncedCalcHeight = debounce(calcRowHeight, 50);
