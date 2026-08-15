@@ -2,7 +2,16 @@
   <div ref="grid" class="grid h-full w-full">
     <WidgetBase
       v-for="widget in widgets"
-      :style="`grid-column: ${widget.x} / span ${widget.width}; grid-row: ${widget.y} / span ${widget.height};`"
+      :key="widget.id"
+      :style="`grid-column: ${widget.position.x} / span ${widget.position.width}; grid-row: ${widget.position.y} / span ${widget.position.height};`"
+      :widgetId="widget.id"
+      @drag-start="onDragStart"
+      @drag-end="onDragEnd"
+    />
+    <WidgetShadow
+      ref="shadow"
+      class="z-40"
+      :class="isDragging ? `` : `hidden`"
     />
   </div>
 </template>
@@ -10,7 +19,21 @@
 const NUM_COLS = 8;
 const GAP = 32;
 const PADDING = 32;
+
 const grid = ref(null);
+const shadow = ref(null);
+const isDragging = ref(false);
+
+const onDragStart = (id) => {
+  const widget = widgets.find((el) => el.id == id);
+  shadow.value.$el.style.gridColumn = `${widget.position.x} / span ${widget.position.width}`;
+  shadow.value.$el.style.gridRow = `${widget.position.y} / span ${widget.position.height}`;
+  isDragging.value = true;
+};
+
+const onDragEnd = () => {
+  isDragging.value = false;
+};
 
 const debounce = (func, delay) => {
   let timer;
@@ -41,76 +64,40 @@ onUnmounted(() => {
 
 const widgets = [
   {
-    x: 1,
-    y: 1,
-    width: 2,
-    height: 2,
+    id: 1,
+    position: {
+      x: 1,
+      y: 1,
+      width: 3,
+      height: 3,
+    },
   },
   {
-    x: 3,
-    y: 1,
-    width: 1,
-    height: 1,
+    id: 2,
+    position: {
+      x: 4,
+      y: 1,
+      width: 2,
+      height: 2,
+    },
   },
   {
-    x: 4,
-    y: 1,
-    width: 3,
-    height: 3,
+    id: 3,
+    position: {
+      x: 6,
+      y: 2,
+      width: 2,
+      height: 2,
+    },
   },
   {
-    x: 7,
-    y: 1,
-    width: 2,
-    height: 2,
-  },
-  {
-    x: 3,
-    y: 2,
-    width: 1,
-    height: 1,
-  },
-  {
-    x: 1,
-    y: 3,
-    width: 3,
-    height: 3,
-  },
-  {
-    x: 4,
-    y: 4,
-    width: 1,
-    height: 1,
-  },
-  {
-    x: 4,
-    y: 5,
-    width: 1,
-    height: 1,
-  },
-  {
-    x: 5,
-    y: 4,
-    width: 2,
-    height: 2,
-  },
-  {
-    x: 7,
-    y: 3,
-    width: 1,
-    height: 1,
-  },
-  {
-    x: 8,
-    y: 3,
-    width: 1,
-    height: 1,
-  },
-  {
-    x: 7,
-    y: 4,
-    width: 2,
-    height: 2,
+    id: 4,
+    position: {
+      x: 8,
+      y: 1,
+      width: 1,
+      height: 1,
+    },
   },
 ];
 </script>

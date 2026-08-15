@@ -19,6 +19,8 @@
 </template>
 <script setup>
 import { Icon } from "@iconify/vue";
+const emit = defineEmits(["dragStart", "dragEnd"]);
+const props = defineProps({ widgetId: Number });
 
 const widget = ref(null);
 const isDragging = ref(false);
@@ -34,6 +36,7 @@ const onMouseDown = (event) => {
 
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
+  emit("dragStart", props.widgetId);
 };
 
 const onMouseMove = (event) => {
@@ -48,5 +51,6 @@ const onMouseUp = (event) => {
 
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
+  emit("dragEnd");
 };
 </script>
