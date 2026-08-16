@@ -42,6 +42,29 @@ const calcGridCoords = (x, y, maxX, maxY = Infinity) => {
   return { x: gridX, y: gridY };
 };
 
+let scrollInterval = null;
+const checkEdgeScroll = (event) => {
+  const SCROLL_SPEED = 8;
+  const INTERVAL_DELAY = 16;
+
+  if (event.clientY < 50) {
+    if (!scrollInterval) {
+      scrollInterval = setInterval(() => {
+        window.scrollBy(0, -SCROLL_SPEED);
+      }, INTERVAL_DELAY);
+    }
+  } else if (window.innerHeight - event.clientY < 50) {
+    if (!scrollInterval) {
+      scrollInterval = setInterval(() => {
+        window.scrollBy(0, SCROLL_SPEED);
+      }, INTERVAL_DELAY);
+    }
+  } else {
+    clearInterval(scrollInterval);
+    scrollInterval = null;
+  }
+};
+
 const onDragStart = (id) => {
   draggingWidget.value = widgets.value.find((el) => el.id == id);
   shadow.value.$el.style.gridColumn = `${draggingWidget.value.position.x} / span ${draggingWidget.value.position.width}`;
@@ -57,11 +80,14 @@ const onDragMove = (event) => {
     window.innerWidth,
   );
 
+  checkEdgeScroll(event);
+
   shadow.value.$el.style.gridColumn = `${draggingCoords.value.x} / span ${draggingWidget.value.position.width}`;
   shadow.value.$el.style.gridRow = `${draggingCoords.value.y} / span ${draggingWidget.value.position.height}`;
 };
 
 const onDragEnd = () => {
+  clearInterval(scrollInterval);
   isDragging.value = false;
   draggingWidget.value.position.x = draggingCoords.value.x;
   draggingWidget.value.position.y = draggingCoords.value.y;
