@@ -29,15 +29,17 @@ const draggingWidget = ref({});
 const draggingCoords = ref({});
 const cellOccupation = ref(new Map());
 
-const calcGridCoords = (x, y, maxX, maxY = Infinity) => {
+const calcGridCoords = (x, y, width, height, maxX, maxY = Infinity) => {
   let gridX = 0;
   if (x < PADDING) gridX = 1;
-  else if (x > maxX - PADDING) gridX = NUM_COLS;
+  else if (x > maxX - PADDING - width * cellSize.value - (width - 1) * GAP)
+    gridX = NUM_COLS + 1 - width;
   else gridX = Math.floor((x - PADDING) / (cellSize.value + GAP)) + 1;
 
   let gridY = 0;
   if (y < PADDING) gridY = 1;
-  else if (y > maxY - PADDING) gridY = NUM_COLS;
+  else if (y > maxY - PADDING - height * cellSize.value - (height - 1) * GAP)
+    gridY = NUM_COLS;
   else gridY = Math.floor((y - PADDING) / (cellSize.value + GAP)) + 1;
 
   return { x: gridX, y: gridY };
@@ -101,6 +103,8 @@ const onDragMove = (event) => {
   draggingCoords.value = calcGridCoords(
     event.pageX,
     event.pageY,
+    draggingWidget.value.position.width,
+    draggingWidget.value.position.height,
     window.innerWidth,
   );
 
