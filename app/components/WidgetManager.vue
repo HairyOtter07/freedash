@@ -27,6 +27,7 @@ const cellSize = ref(0);
 const isDragging = ref(false);
 const draggingWidget = ref({});
 const draggingCoords = ref({});
+const cellOccupation = ref(new Map());
 
 const calcGridCoords = (x, y, maxX, maxY = Infinity) => {
   let gridX = 0;
@@ -65,10 +66,33 @@ const checkEdgeScroll = (event) => {
   }
 };
 
+const getMapCell = (map, x, y) => {
+  return map.get(x)?.get(y);
+};
+
+const setMapCell = (map, x, y, value) => {
+  if (!map.has(x)) {
+    map.set(x, new Map());
+  }
+  map.get(x).set(y, value);
+};
+
 const onDragStart = (id) => {
   draggingWidget.value = widgets.value.find((el) => el.id == id);
   shadow.value.$el.style.gridColumn = `${draggingWidget.value.position.x} / span ${draggingWidget.value.position.width}`;
   shadow.value.$el.style.gridRow = `${draggingWidget.value.position.y} / span ${draggingWidget.value.position.height}`;
+
+  for (let x = 0; x < draggingWidget.value.position.width; x++) {
+    for (let y = 0; y < draggingWidget.value.position.height; y++) {
+      setMapCell(
+        cellOccupation.value,
+        draggingWidget.value.position.x + x,
+        draggingWidget.value.position.y + y,
+        false,
+      );
+    }
+  }
+
   isDragging.value = true;
   document.addEventListener("mousemove", onDragMove);
 };
@@ -87,11 +111,45 @@ const onDragMove = (event) => {
 };
 
 const onDragEnd = () => {
+  document.removeEventListener("mousemove", onDragMove);
   clearInterval(scrollInterval);
   isDragging.value = false;
+
+  for (let x = 0; x < draggingWidget.value.position.width; x++) {
+    for (let y = 0; y < draggingWidget.value.position.height; y++) {
+      console.log(
+        draggingCoords.value.x + x,
+        draggingCoords.value.y + y,
+        getMapCell(
+          cellOccupation.value,
+          draggingCoords.value.x + x,
+          draggingCoords.value.y + y,
+        ),
+      );
+      if (
+        getMapCell(
+          cellOccupation.value,
+          draggingCoords.value.x + x,
+          draggingCoords.value.y + y,
+        )
+      )
+        return;
+    }
+  }
+
   draggingWidget.value.position.x = draggingCoords.value.x;
   draggingWidget.value.position.y = draggingCoords.value.y;
-  document.removeEventListener("mousemove", onDragMove);
+
+  for (let x = 0; x < draggingWidget.value.position.width; x++) {
+    for (let y = 0; y < draggingWidget.value.position.height; y++) {
+      setMapCell(
+        cellOccupation.value,
+        draggingWidget.value.position.x + x,
+        draggingWidget.value.position.y + y,
+        true,
+      );
+    }
+  }
 };
 
 const debounce = (func, delay) => {
@@ -117,6 +175,18 @@ onMounted(() => {
   grid.value.style.padding = `${PADDING}px`;
   calcRowHeight();
   window.addEventListener("resize", debouncedCalcHeight);
+  for (const widget of widgets.value) {
+    for (let x = 0; x < widget.position.width; x++) {
+      for (let y = 0; y < widget.position.height; y++) {
+        setMapCell(
+          cellOccupation.value,
+          widget.position.x + x,
+          widget.position.y + y,
+          true,
+        );
+      }
+    }
+  }
 });
 
 onUnmounted(() => {
