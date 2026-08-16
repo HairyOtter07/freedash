@@ -14,7 +14,7 @@
       "
       @mousedown="onMouseDown"
     />
-    <p class="text-white">hello</p>
+    <slot />
   </div>
 </template>
 <script setup>
