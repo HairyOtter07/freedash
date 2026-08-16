@@ -115,30 +115,27 @@ const onDragEnd = () => {
   clearInterval(scrollInterval);
   isDragging.value = false;
 
+  let isOccupied = false;
+
   for (let x = 0; x < draggingWidget.value.position.width; x++) {
     for (let y = 0; y < draggingWidget.value.position.height; y++) {
-      console.log(
-        draggingCoords.value.x + x,
-        draggingCoords.value.y + y,
-        getMapCell(
-          cellOccupation.value,
-          draggingCoords.value.x + x,
-          draggingCoords.value.y + y,
-        ),
-      );
       if (
         getMapCell(
           cellOccupation.value,
           draggingCoords.value.x + x,
           draggingCoords.value.y + y,
         )
-      )
-        return;
+      ) {
+        isOccupied = true;
+        break;
+      }
     }
   }
 
-  draggingWidget.value.position.x = draggingCoords.value.x;
-  draggingWidget.value.position.y = draggingCoords.value.y;
+  if (!isOccupied) {
+    draggingWidget.value.position.x = draggingCoords.value.x;
+    draggingWidget.value.position.y = draggingCoords.value.y;
+  }
 
   for (let x = 0; x < draggingWidget.value.position.width; x++) {
     for (let y = 0; y < draggingWidget.value.position.height; y++) {
