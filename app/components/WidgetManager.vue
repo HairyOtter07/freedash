@@ -4,10 +4,12 @@
       v-for="widget in widgets"
       :key="widget.id"
       :style="`grid-column: ${widget.position.x} / span ${widget.position.width}; grid-row: ${widget.position.y} / span ${widget.position.height};`"
-      :widgetId="widget.id"
+      :widget-id="widget.id"
       @drag-start="onDragStart"
       @drag-end="onDragEnd"
-    />
+    >
+      <component :is="COMPONENT_MAP[widget.type]" v-bind="widget.props" />
+    </WidgetBase>
     <WidgetShadow
       ref="shadow"
       class="z-40"
@@ -19,6 +21,10 @@
 const NUM_COLS = 8;
 const GAP = 32;
 const PADDING = 32;
+
+const COMPONENT_MAP = {
+  Countdown: resolveComponent("Countdown"),
+};
 
 const grid = ref(null);
 const shadow = ref(null);
@@ -197,38 +203,16 @@ onUnmounted(() => {
 const widgets = ref([
   {
     id: 1,
+    type: "Countdown",
+    props: {
+      targetDate: new Date(2026, 7, 16, 21, 0, 0),
+      event: "test event",
+    },
     position: {
       x: 1,
       y: 1,
-      width: 3,
-      height: 3,
-    },
-  },
-  {
-    id: 2,
-    position: {
-      x: 4,
-      y: 1,
       width: 2,
       height: 2,
-    },
-  },
-  {
-    id: 3,
-    position: {
-      x: 6,
-      y: 2,
-      width: 2,
-      height: 2,
-    },
-  },
-  {
-    id: 4,
-    position: {
-      x: 8,
-      y: 1,
-      width: 1,
-      height: 1,
     },
   },
 ]);
