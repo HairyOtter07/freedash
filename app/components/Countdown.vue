@@ -7,28 +7,27 @@
       <h2 v-if="!isComplete" class="text-lg">{{ unit }}</h2>
     </div>
     <p class="absolute inset-x-4 bottom-2 text-center text-lg">
-      {{ isComplete ? "" : "until "
-      }}<span class="font-bold">{{ props.event }}</span>
+      {{ isComplete ? "" : "until " }}<span class="font-bold">{{ event }}</span>
     </p>
   </div>
 </template>
 <script setup>
 import dayjs from "dayjs";
 
-const props = defineProps({
-  targetDate: Date,
-  event: String,
-});
+const options = defineModel();
+
+const targetDate = computed(() => options.value.targetDate);
+const event = computed(() => options.value.event);
 
 const num = ref(0);
 const unit = ref("");
 const isComplete = ref(false);
 
 const updateDiff = () => {
-  const targetDate = dayjs(props.targetDate);
+  const target = dayjs(targetDate.value);
   const now = dayjs();
 
-  if (targetDate.diff(now) < 1000) {
+  if (target.diff(now) < 1000) {
     num.value = 0;
     unit.value = "seconds";
     isComplete.value = true;
@@ -36,17 +35,17 @@ const updateDiff = () => {
     return;
   }
 
-  if (targetDate.diff(now, "day") > 0) {
-    num.value = targetDate.diff(now, "day");
+  if (target.diff(now, "day") > 0) {
+    num.value = target.diff(now, "day");
     unit.value = num.value > 1 ? "days" : "day";
-  } else if (targetDate.diff(now, "hour") > 0) {
-    num.value = targetDate.diff(now, "hour");
+  } else if (target.diff(now, "hour") > 0) {
+    num.value = target.diff(now, "hour");
     unit.value = num.value > 1 ? "hours" : "hour";
-  } else if (targetDate.diff(now, "minute") > 0) {
-    num.value = targetDate.diff(now, "minute");
+  } else if (target.diff(now, "minute") > 0) {
+    num.value = target.diff(now, "minute");
     unit.value = num.value > 1 ? "minutes" : "minute";
   } else {
-    num.value = targetDate.diff(now, "second");
+    num.value = target.diff(now, "second");
     unit.value = num.value > 1 ? "seconds" : "second";
   }
 };
@@ -61,7 +60,7 @@ onUnmounted(() => {
   clearInterval(updateInterval);
 });
 
-watch(props, () => {
+watch(options, () => {
   isComplete.value = false;
   clearInterval(updateInterval);
   updateDiff();
