@@ -9,15 +9,23 @@
     <p class="absolute inset-x-4 bottom-2 text-center text-lg">
       {{ isComplete ? "" : "until " }}<span class="font-bold">{{ event }}</span>
     </p>
+    <ConfigDialog v-if="isConfigOpen" @close="onConfigClose">
+      <ConfigSection title="Countdown" v-model="options" />
+      <slot />
+    </ConfigDialog>
   </div>
 </template>
 <script setup>
 import dayjs from "dayjs";
+defineProps({
+  isConfigOpen: Boolean,
+  onConfigClose: Function,
+});
 
 const options = defineModel();
 
-const targetDate = computed(() => options.value.targetDate);
-const event = computed(() => options.value.event);
+const targetDate = computed(() => options.value.targetDate.value);
+const event = computed(() => options.value.event.value);
 
 const num = ref(0);
 const unit = ref("");

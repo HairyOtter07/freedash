@@ -1,12 +1,18 @@
 <template>
   <div class="flex flex-row justify-between">
     <p>{{ name }}</p>
-    <p>{{ value }}</p>
+    <component :is="INPUT_COMPONENT_MAP[`${type}Input`]" v-model="value" />
   </div>
 </template>
 <script setup>
-defineProps({
+const props = defineProps({
   name: String,
-  value: String,
+  type: String,
 });
+
+const value = defineModel();
+
+const INPUT_COMPONENT_MAP = {
+  TextInput: resolveComponent("TextInput"),
+};
 </script>

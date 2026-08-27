@@ -2,13 +2,21 @@
   <div ref="grid" class="grid h-full w-full">
     <WidgetBase
       v-for="widget in widgets"
+      v-slot="widgetSlotProps"
       :key="widget.id"
       :style="`grid-column: ${widget.position.x} / span ${widget.position.width}; grid-row: ${widget.position.y} / span ${widget.position.height};`"
       :widget-id="widget.id"
       @drag-start="onDragStart"
       @drag-end="onDragEnd"
     >
-      <component :is="COMPONENT_MAP[widget.type]" v-bind="widget.props" />
+      <component
+        :is="COMPONENT_MAP[widget.type]"
+        v-model="widget.options"
+        :isConfigOpen="widgetSlotProps.isConfigOpen"
+        :onConfigClose="widgetSlotProps.onConfigClose"
+      >
+        <ConfigSection title="Widget Appearance" v-model="widget.theme" />
+      </component>
     </WidgetBase>
     <WidgetShadow
       ref="shadow"
@@ -204,9 +212,49 @@ const widgets = ref([
   {
     id: 1,
     type: "Countdown",
-    props: {
-      targetDate: new Date(2026, 7, 16, 21, 0, 0),
-      event: "test event",
+    theme: {
+      backgroundColor: {
+        name: "Background Color",
+        type: "Text",
+        value: "Gray",
+      },
+      textColor: {
+        name: "Text Color",
+        type: "Text",
+        value: "White",
+      },
+      borderColor: {
+        name: "Border Color",
+        type: "Text",
+        value: "None",
+      },
+      cornerIconColor: {
+        name: "Corner Button Icon Color",
+        type: "Text",
+        value: "Black",
+      },
+      cornerBackgroundColor: {
+        name: "Corner Button Background Color",
+        type: "Text",
+        value: "White",
+      },
+      size: {
+        name: "Size",
+        type: "Text",
+        value: "2x2",
+      },
+    },
+    options: {
+      targetDate: {
+        name: "Target Date",
+        type: "Text",
+        value: new Date(2026, 7, 30, 18, 0, 0),
+      },
+      event: {
+        name: "Event",
+        type: "Text",
+        value: "landing in LA",
+      },
     },
     position: {
       x: 1,

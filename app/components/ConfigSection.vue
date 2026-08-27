@@ -1,12 +1,19 @@
 <template>
   <div class="flex flex-col gap-2 p-2">
-    <h1 class="text-2xl">Appearance</h1>
+    <h1 class="text-2xl">{{ title }}</h1>
     <hr class="border-t-2 border-zinc-500" />
-    <ConfigItem name="Background Color" value="Gray" />
-    <ConfigItem name="Text Color" value="White" />
-    <ConfigItem name="Border Color" value="None" />
-    <ConfigItem name="Corner Button Icon Color" value="Black" />
-    <ConfigItem name="Corner Button Background Color" value="White" />
-    <ConfigItem name="Size" value="2x2" />
+    <ConfigItem
+      v-for="item in Object.keys(items)"
+      :name="items[item].name"
+      :type="items[item].type"
+      v-model="items[item].value"
+    />
   </div>
 </template>
+<script setup>
+const props = defineProps({
+  title: String,
+});
+
+const items = defineModel();
+</script>

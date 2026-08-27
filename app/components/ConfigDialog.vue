@@ -1,5 +1,5 @@
 <template>
-  <Modal :is-active="isOpen">
+  <Modal>
     <div
       class="relative flex w-full max-w-2xl flex-col gap-4 rounded-xl bg-zinc-700 p-4 text-white"
     >
@@ -14,9 +14,9 @@
 </template>
 <script setup>
 import { Icon } from "@iconify/vue";
-const isOpen = defineModel();
+const emit = defineEmits(["close"]);
 
 const onCloseClick = (event) => {
-  isOpen.value = false;
+  emit("close");
 };
 </script>
