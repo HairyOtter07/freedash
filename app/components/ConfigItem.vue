@@ -14,5 +14,6 @@ const value = defineModel();
 
 const INPUT_COMPONENT_MAP = {
   TextInput: resolveComponent("TextInput"),
+  DateInput: resolveComponent("DateInput"),
 };
 </script>

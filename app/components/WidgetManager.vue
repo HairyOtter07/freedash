@@ -247,8 +247,8 @@ const widgets = ref([
     options: {
       targetDate: {
         name: "Target Date",
-        type: "Text",
-        value: new Date(2026, 7, 30, 18, 0, 0),
+        type: "Date",
+        value: "2026-08-30T18:00",
       },
       event: {
         name: "Event",
