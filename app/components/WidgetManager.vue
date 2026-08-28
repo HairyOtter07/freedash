@@ -6,6 +6,7 @@
       :key="widget.id"
       :style="`grid-column: ${widget.position.x} / span ${widget.position.width}; grid-row: ${widget.position.y} / span ${widget.position.height};`"
       :widget-id="widget.id"
+      :widget-theme="widget.theme"
       @drag-start="onDragStart"
       @drag-end="onDragEnd"
     >

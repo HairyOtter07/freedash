@@ -1,12 +1,12 @@
 <template>
   <div
     ref="widget"
-    class="group relative flex h-full w-full flex-col items-center justify-center rounded-xl bg-zinc-700 text-white"
+    class="group relative flex h-full w-full flex-col items-center justify-center rounded-xl border border-(--borderColor) bg-(--backgroundColor) text-(--textColor)"
     :class="isDragging ? `z-50 cursor-grabbing shadow-xl` : ``"
   >
     <Icon
       icon="material-symbols:drag-pan-rounded"
-      class="absolute top-0 left-0 z-10 h-5 w-5 -translate-1/2 rounded-full bg-white p-px text-black"
+      class="absolute top-0 left-0 z-10 h-5 w-5 -translate-1/2 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor)"
       :class="
         isDragging
           ? `block cursor-grabbing`
@@ -16,7 +16,7 @@
     />
     <Icon
       icon="material-symbols:settings-rounded"
-      class="absolute top-0 right-0 z-10 hidden h-5 w-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-white p-px text-black group-hover:block hover:cursor-pointer"
+      class="absolute top-0 right-0 z-10 hidden h-5 w-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) group-hover:block hover:cursor-pointer"
       @click="onConfigClick"
     />
     <slot :isConfigOpen="isConfigOpen" :onConfigClose="onConfigClose" />
@@ -25,7 +25,7 @@
 <script setup>
 import { Icon } from "@iconify/vue";
 const emit = defineEmits(["dragStart", "dragEnd"]);
-const props = defineProps({ widgetId: Number });
+const props = defineProps({ widgetId: Number, widgetTheme: Object });
 
 const widget = ref(null);
 const isDragging = ref(false);
@@ -67,4 +67,11 @@ const onDragEnd = (event) => {
   document.removeEventListener("mouseup", onDragEnd);
   emit("dragEnd");
 };
+
+watchEffect(() => {
+  if (!widget.value || !props.widgetTheme) return;
+  for (const key of Object.keys(props.widgetTheme)) {
+    widget.value.style.setProperty(`--${key}`, props.widgetTheme[key].value);
+  }
+});
 </script>
