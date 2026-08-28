@@ -215,28 +215,28 @@ const widgets = ref([
     theme: {
       backgroundColor: {
         name: "Background Color",
-        type: "Text",
-        value: "Gray",
+        type: "Color",
+        value: "#3f3f46",
       },
       textColor: {
         name: "Text Color",
-        type: "Text",
-        value: "White",
+        type: "Color",
+        value: "#ffffff",
       },
       borderColor: {
         name: "Border Color",
-        type: "Text",
-        value: "None",
+        type: "Color",
+        value: "#3f3f46",
       },
       cornerBackgroundColor: {
         name: "Corner Button Background Color",
-        type: "Text",
-        value: "White",
+        type: "Color",
+        value: "#ffffff",
       },
       cornerIconColor: {
         name: "Corner Button Icon Color",
-        type: "Text",
-        value: "Black",
+        type: "Color",
+        value: "#000000",
       },
       size: {
         name: "Size",
