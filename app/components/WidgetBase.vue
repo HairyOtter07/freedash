@@ -1,7 +1,7 @@
 <template>
   <div
     ref="widget"
-    class="group relative flex h-full w-full flex-col items-center justify-center rounded-xl bg-zinc-700"
+    class="group relative flex h-full w-full flex-col items-center justify-center rounded-xl bg-zinc-700 text-white"
     :class="isDragging ? `z-50 cursor-grabbing shadow-xl` : ``"
   >
     <Icon
