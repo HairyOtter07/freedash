@@ -228,15 +228,15 @@ const widgets = ref([
         type: "Text",
         value: "None",
       },
-      cornerIconColor: {
-        name: "Corner Button Icon Color",
-        type: "Text",
-        value: "Black",
-      },
       cornerBackgroundColor: {
         name: "Corner Button Background Color",
         type: "Text",
         value: "White",
+      },
+      cornerIconColor: {
+        name: "Corner Button Icon Color",
+        type: "Text",
+        value: "Black",
       },
       size: {
         name: "Size",
