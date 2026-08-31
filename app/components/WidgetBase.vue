@@ -1,7 +1,7 @@
 <template>
   <div
     ref="widget"
-    class="group relative flex h-full w-full flex-col items-center justify-center rounded-xl border border-(--borderColor) bg-(--backgroundColor) text-(--textColor)"
+    class="group relative flex h-full w-full flex-col items-center justify-center rounded-xl border border-(--borderColor) bg-(--widgetBackgroundColor) text-(--textColor)"
     :class="isDragging ? `z-50 cursor-grabbing shadow-xl` : ``"
   >
     <Icon
@@ -68,10 +68,22 @@ const onDragEnd = (event) => {
   emit("dragEnd");
 };
 
+const themeOptions = [
+  "widgetBackgroundColor",
+  "textColor",
+  "borderColor",
+  "cornerBackgroundColor",
+  "cornerIconColor",
+];
 watchEffect(() => {
   if (!widget.value || !props.widgetTheme) return;
-  for (const key of Object.keys(props.widgetTheme)) {
-    widget.value.style.setProperty(`--${key}`, props.widgetTheme[key].value);
+  for (const option of themeOptions) {
+    if (props.widgetTheme[option])
+      widget.value.style.setProperty(
+        `--${option}`,
+        props.widgetTheme[option].value,
+      );
+    else widget.value.style.removeProperty(`--${option}`);
   }
 });
 </script>

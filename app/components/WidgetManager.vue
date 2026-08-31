@@ -16,7 +16,11 @@
         :isConfigOpen="widgetSlotProps.isConfigOpen"
         :onConfigClose="widgetSlotProps.onConfigClose"
       >
-        <ConfigSection title="Widget Appearance" v-model="widget.theme" />
+        <ThemeConfigSection
+          title="Widget Appearance"
+          is-widget
+          v-model="widget.theme"
+        />
       </component>
     </WidgetBase>
     <WidgetShadow
@@ -24,9 +28,16 @@
       class="z-40"
       :class="isDragging ? `` : `hidden`"
     />
+    <Icon
+      icon="material-symbols:settings-rounded"
+      class="fixed right-0 bottom-0 z-90 h-5 w-5 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
+      @click=""
+    />
   </div>
 </template>
 <script setup>
+import { Icon } from "@iconify/vue";
+
 const NUM_COLS = 8;
 const GAP = 32;
 const PADDING = 32;
@@ -209,40 +220,65 @@ onUnmounted(() => {
   window.removeEventListener("resize", debouncedCalcHeight);
 });
 
+const theme = useCookie("theme");
+
+theme.value ||= {
+  backgroundColor: {
+    name: "Background Color",
+    type: "Color",
+    value: "#18181b",
+  },
+  widgetBackgroundColor: {
+    name: "Widget Background Color",
+    type: "Color",
+    value: "#3f3f46",
+  },
+  textColor: {
+    name: "Text Color",
+    type: "Color",
+    value: "#ffffff",
+  },
+  borderColor: {
+    name: "Border Color",
+    type: "Color",
+    value: "#3f3f46",
+  },
+  cornerBackgroundColor: {
+    name: "Corner Button Background Color",
+    type: "Color",
+    value: "#ffffff",
+  },
+  cornerIconColor: {
+    name: "Corner Button Icon Color",
+    type: "Color",
+    value: "#000000",
+  },
+};
+
 const widgets = ref([
   {
     id: 1,
     type: "Countdown",
     theme: {
-      backgroundColor: {
-        name: "Background Color",
-        type: "Color",
+      widgetBackgroundColor: {
+        name: "Widget Background Color",
         value: "#3f3f46",
       },
       textColor: {
         name: "Text Color",
-        type: "Color",
         value: "#ffffff",
       },
       borderColor: {
         name: "Border Color",
-        type: "Color",
         value: "#3f3f46",
       },
       cornerBackgroundColor: {
         name: "Corner Button Background Color",
-        type: "Color",
         value: "#ffffff",
       },
       cornerIconColor: {
         name: "Corner Button Icon Color",
-        type: "Color",
         value: "#000000",
-      },
-      size: {
-        name: "Size",
-        type: "Text",
-        value: "2x2",
       },
     },
     options: {
@@ -265,4 +301,13 @@ const widgets = ref([
     },
   },
 ]);
+
+watchEffect(() => {
+  for (const key of Object.keys(theme.value)) {
+    document.documentElement.style.setProperty(
+      `--${key}`,
+      theme.value[key].value,
+    );
+  }
+});
 </script>
