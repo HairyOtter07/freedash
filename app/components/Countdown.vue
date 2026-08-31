@@ -68,10 +68,15 @@ onUnmounted(() => {
   clearInterval(updateInterval);
 });
 
-watch(options, () => {
-  isComplete.value = false;
-  clearInterval(updateInterval);
-  updateDiff();
-  updateInterval = setInterval(updateDiff, 1000);
-});
+watch(
+  options,
+  () => {
+    console.log(options.value.targetDate.value);
+    isComplete.value = false;
+    clearInterval(updateInterval);
+    updateDiff();
+    updateInterval = setInterval(updateDiff, 1000);
+  },
+  { deep: true },
+);
 </script>
