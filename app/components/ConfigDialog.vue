@@ -1,11 +1,11 @@
 <template>
   <Modal>
     <div
-      class="relative flex w-full max-w-2xl flex-col gap-4 rounded-xl bg-zinc-700 p-4 text-white"
+      class="relative flex w-full max-w-2xl flex-col gap-4 rounded-xl border-2 border-(--borderColor) bg-(--widgetBackgroundColor) p-4 text-(--textColor)"
     >
       <Icon
         icon="material-symbols:close-rounded"
-        class="absolute top-0 right-0 z-10 h-5 w-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-white p-px text-black hover:cursor-pointer"
+        class="absolute top-0 right-0 z-10 h-5 w-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) hover:cursor-pointer"
         @click="onCloseClick"
       />
       <slot />

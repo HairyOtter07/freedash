@@ -30,9 +30,12 @@
     />
     <Icon
       icon="material-symbols:settings-rounded"
-      class="fixed right-0 bottom-0 z-90 h-5 w-5 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
-      @click=""
+      class="fixed right-3 bottom-3 z-90 h-8 w-8 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
+      @click="onThemeConfigClick"
     />
+    <ConfigDialog v-if="isThemeConfigOpen" @close="onThemeConfigClose">
+      <ThemeConfigSection title="Theme" v-model="theme" />
+    </ConfigDialog>
   </div>
 </template>
 <script setup>
@@ -54,6 +57,14 @@ const isDragging = ref(false);
 const draggingWidget = ref({});
 const draggingCoords = ref({});
 const cellOccupation = ref(new Map());
+const isThemeConfigOpen = ref(false);
+
+const onThemeConfigClick = () => {
+  isThemeConfigOpen.value = true;
+};
+const onThemeConfigClose = () => {
+  isThemeConfigOpen.value = false;
+};
 
 const calcGridCoords = (x, y, width, height, maxX, maxY = Infinity) => {
   let gridX = 0;
@@ -303,6 +314,7 @@ const widgets = ref([
 ]);
 
 watchEffect(() => {
+  if (!document) return;
   for (const key of Object.keys(theme.value)) {
     document.documentElement.style.setProperty(
       `--${key}`,

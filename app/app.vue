@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full min-h-screen w-full bg-zinc-900">
+  <div class="h-full min-h-screen w-full bg-(--backgroundColor)">
     <WidgetManager />
   </div>
 </template>

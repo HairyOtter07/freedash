@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-2 p-2">
     <h1 class="text-2xl">{{ title }}</h1>
-    <hr class="border-t-2 border-zinc-500" />
+    <hr class="border-t-2 border-(--borderColor)" />
     <ThemeConfigItem
       v-if="props.isWidget"
       v-for="option in themeOptions"
