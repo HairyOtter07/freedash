@@ -109,6 +109,16 @@ const onAddClick = () => {
 };
 
 const deleteWidget = (widget) => {
+  for (let x = 0; x < widget.position.width; x++) {
+    for (let y = 0; y < widget.position.height; y++) {
+      setMapCell(
+        cellOccupation.value,
+        widget.position.x + x,
+        widget.position.y + y,
+        false,
+      );
+    }
+  }
   const index = widgets.value.indexOf(widget);
   widgets.value.splice(index, 1);
 };
