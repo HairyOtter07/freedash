@@ -28,11 +28,18 @@
       class="z-40"
       :class="isDragging ? `` : `hidden`"
     />
-    <Icon
-      icon="material-symbols:settings-rounded"
-      class="fixed right-3 bottom-3 z-90 h-8 w-8 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
-      @click="onThemeConfigClick"
-    />
+    <div class="fixed right-3 bottom-3 z-90 flex flex-row gap-3">
+      <Icon
+        icon="material-symbols:settings-rounded"
+        class="h-8 w-8 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
+        @click="onThemeConfigClick"
+      />
+      <Icon
+        icon="material-symbols:add-rounded"
+        class="h-8 w-8 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
+        @click="onAddClick"
+      />
+    </div>
     <ConfigDialog v-if="isThemeConfigOpen" @close="onThemeConfigClose">
       <ThemeConfigSection title="Theme" v-model="theme" />
     </ConfigDialog>
@@ -52,6 +59,7 @@ const COMPONENT_MAP = {
 const grid = ref(null);
 const shadow = ref(null);
 
+const widgets = ref([]);
 const cellSize = ref(0);
 const isDragging = ref(false);
 const draggingWidget = ref({});
@@ -64,6 +72,39 @@ const onThemeConfigClick = () => {
 };
 const onThemeConfigClose = () => {
   isThemeConfigOpen.value = false;
+};
+
+const onAddClick = () => {
+  let i = 1;
+  while (getMapCell(cellOccupation.value, 1, i)) i++;
+  widgets.value.push({
+    id: widgets.value.length + 1,
+    type: "Countdown",
+    theme: {},
+    options: {
+      targetDate: {
+        name: "Target Date",
+        type: "Date",
+        value: "2026-08-30T18:00",
+      },
+      event: {
+        name: "Event",
+        type: "Text",
+        value: "landing in LA",
+      },
+    },
+    position: {
+      x: 1,
+      y: i,
+      width: 2,
+      height: 2,
+    },
+  });
+  for (let x = 0; x < 2; x++) {
+    for (let y = 0; y < 2; y++) {
+      setMapCell(cellOccupation.value, 1 + x, i + y, true);
+    }
+  }
 };
 
 const calcGridCoords = (x, y, width, height, maxX, maxY = Infinity) => {
@@ -208,11 +249,17 @@ const calcRowHeight = (event) => {
 const debouncedCalcHeight = debounce(calcRowHeight, 50);
 
 onMounted(() => {
+  if (!localStorage.getItem("widgets")) {
+    localStorage.setItem("widgets", "[]");
+  }
+  widgets.value = JSON.parse(localStorage.getItem("widgets"));
+
   grid.value.style.gridTemplateColumns = `repeat(${NUM_COLS}, minmax(0, 1fr))`;
   grid.value.style.gap = `${GAP}px`;
   grid.value.style.padding = `${PADDING}px`;
   calcRowHeight();
   window.addEventListener("resize", debouncedCalcHeight);
+
   for (const widget of widgets.value) {
     for (let x = 0; x < widget.position.width; x++) {
       for (let y = 0; y < widget.position.height; y++) {
@@ -225,6 +272,11 @@ onMounted(() => {
       }
     }
   }
+
+  watchEffect(() => {
+    if (!process.client) return;
+    localStorage.setItem("widgets", JSON.stringify(widgets.value));
+  });
 });
 
 onUnmounted(() => {
@@ -265,53 +317,6 @@ theme.value ||= {
     value: "#000000",
   },
 };
-
-const widgets = ref([
-  {
-    id: 1,
-    type: "Countdown",
-    theme: {
-      widgetBackgroundColor: {
-        name: "Widget Background Color",
-        value: "#3f3f46",
-      },
-      textColor: {
-        name: "Text Color",
-        value: "#ffffff",
-      },
-      borderColor: {
-        name: "Border Color",
-        value: "#3f3f46",
-      },
-      cornerBackgroundColor: {
-        name: "Corner Button Background Color",
-        value: "#ffffff",
-      },
-      cornerIconColor: {
-        name: "Corner Button Icon Color",
-        value: "#000000",
-      },
-    },
-    options: {
-      targetDate: {
-        name: "Target Date",
-        type: "Date",
-        value: "2026-08-30T18:00",
-      },
-      event: {
-        name: "Event",
-        type: "Text",
-        value: "landing in LA",
-      },
-    },
-    position: {
-      x: 1,
-      y: 1,
-      width: 2,
-      height: 2,
-    },
-  },
-]);
 
 watchEffect(() => {
   if (!document) return;
