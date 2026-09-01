@@ -11,7 +11,7 @@
       @drag-end="onDragEnd"
     >
       <component
-        :is="COMPONENT_MAP[widget.type]"
+        :is="WIDGET_MAP[widget.type].component"
         v-model="widget.options"
         :isConfigOpen="widgetSlotProps.isConfigOpen"
         :onConfigClose="widgetSlotProps.onConfigClose"
@@ -44,6 +44,12 @@
     <ConfigDialog v-if="isThemeConfigOpen" @close="onThemeConfigClose">
       <ThemeConfigSection title="Theme" v-model="theme" />
     </ConfigDialog>
+    <WidgetSelector
+      v-if="isWidgetSelectorOpen"
+      :widget-map="WIDGET_MAP"
+      @select="onWidgetSelectorSelect"
+      @close="onWidgetSelectorClose"
+    />
   </div>
 </template>
 <script setup>
@@ -53,8 +59,17 @@ const NUM_COLS = 8;
 const GAP = 32;
 const PADDING = 32;
 
-const COMPONENT_MAP = {
-  Countdown: resolveComponent("Countdown"),
+const WIDGET_MAP = {
+  Countdown: {
+    name: "Countdown",
+    description: "Displays a countdown to an event.",
+    component: resolveComponent("Countdown"),
+    options: {
+      targetDate: "Date",
+      event: "Text",
+    },
+    sizes: [[2, 2]],
+  },
 };
 
 const grid = ref(null);
@@ -67,6 +82,7 @@ const draggingWidget = ref({});
 const draggingCoords = ref({});
 const cellOccupation = ref(new Map());
 const isThemeConfigOpen = ref(false);
+const isWidgetSelectorOpen = ref(false);
 
 const onThemeConfigClick = () => {
   isThemeConfigOpen.value = true;
@@ -76,36 +92,15 @@ const onThemeConfigClose = () => {
 };
 
 const onAddClick = () => {
-  let i = 1;
-  while (getMapCell(cellOccupation.value, 1, i)) i++;
-  widgets.value.push({
-    id: widgets.value.length + 1,
-    type: "Countdown",
-    theme: {},
-    options: {
-      targetDate: {
-        name: "Target Date",
-        type: "Date",
-        value: "2026-08-30T18:00",
-      },
-      event: {
-        name: "Event",
-        type: "Text",
-        value: "landing in LA",
-      },
-    },
-    position: {
-      x: 1,
-      y: i,
-      width: 2,
-      height: 2,
-    },
-  });
-  for (let x = 0; x < 2; x++) {
-    for (let y = 0; y < 2; y++) {
-      setMapCell(cellOccupation.value, 1 + x, i + y, true);
-    }
-  }
+  isWidgetSelectorOpen.value = true;
+};
+
+const onWidgetSelectorSelect = (selected) => {
+  console.log(selected);
+};
+
+const onWidgetSelectorClose = () => {
+  isWidgetSelectorOpen.value = false;
 };
 
 const deleteWidget = (widget) => {
