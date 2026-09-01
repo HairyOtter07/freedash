@@ -15,6 +15,7 @@
         v-model="widget.options"
         :isConfigOpen="widgetSlotProps.isConfigOpen"
         :onConfigClose="widgetSlotProps.onConfigClose"
+        :onDelete="() => deleteWidget(widget)"
       >
         <ThemeConfigSection
           title="Widget Appearance"
@@ -28,7 +29,7 @@
       class="z-40"
       :class="isDragging ? `` : `hidden`"
     />
-    <div class="fixed right-3 bottom-3 z-90 flex flex-row gap-3">
+    <div class="fixed right-3 bottom-3 z-40 flex flex-row gap-3">
       <Icon
         icon="material-symbols:settings-rounded"
         class="h-8 w-8 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) shadow-xl hover:cursor-pointer"
@@ -105,6 +106,11 @@ const onAddClick = () => {
       setMapCell(cellOccupation.value, 1 + x, i + y, true);
     }
   }
+};
+
+const deleteWidget = (widget) => {
+  const index = widgets.value.indexOf(widget);
+  widgets.value.splice(index, 1);
 };
 
 const calcGridCoords = (x, y, width, height, maxX, maxY = Infinity) => {

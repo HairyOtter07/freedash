@@ -8,15 +8,44 @@
         class="absolute top-0 right-0 z-10 h-5 w-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) hover:cursor-pointer"
         @click="onCloseClick"
       />
+      <Icon
+        v-if="isWidget"
+        icon="material-symbols:delete-outline-rounded"
+        class="absolute top-0 left-0 z-10 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) hover:cursor-pointer"
+        @click="onDeleteClick"
+      />
+      <div
+        v-if="isDeleteOnce"
+        class="absolute top-0 left-0 flex h-5 -translate-x-2.5 -translate-y-1/2 items-center justify-center rounded-full bg-(--cornerBackgroundColor) p-2 pl-6 text-sm text-(--cornerIconColor) hover:cursor-pointer"
+        @click="onDeleteClick"
+      >
+        delete this widget?
+      </div>
       <slot />
     </div>
   </Modal>
 </template>
 <script setup>
 import { Icon } from "@iconify/vue";
-const emit = defineEmits(["close"]);
+defineProps({
+  isWidget: Boolean,
+  isNew: Boolean,
+});
+
+const emit = defineEmits(["close", "delete"]);
+
+const isDeleteOnce = ref(false);
 
 const onCloseClick = (event) => {
   emit("close");
+};
+
+const onDeleteClick = (event) => {
+  if (isDeleteOnce.value) {
+    emit("close");
+    emit("delete");
+  } else {
+    isDeleteOnce.value = true;
+  }
 };
 </script>
