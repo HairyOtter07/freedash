@@ -15,6 +15,7 @@
       @mousedown="onDragStart"
     />
     <Icon
+      v-if="!isNewWidget"
       icon="material-symbols:settings-rounded"
       class="absolute top-0 right-0 z-10 hidden h-5 w-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-(--cornerBackgroundColor) p-px text-(--cornerIconColor) group-hover:block hover:cursor-pointer"
       @click="onConfigClick"
@@ -25,7 +26,11 @@
 <script setup>
 import { Icon } from "@iconify/vue";
 const emit = defineEmits(["dragStart", "dragEnd"]);
-const props = defineProps({ widgetId: Number, widgetTheme: Object });
+const props = defineProps({
+  widgetId: Number,
+  widgetTheme: Object,
+  isNewWidget: Boolean,
+});
 
 const widget = ref(null);
 const isDragging = ref(false);
@@ -44,8 +49,8 @@ const onConfigClose = () => {
 const onDragStart = (event) => {
   event.preventDefault();
 
-  dragStartX.value = event.pageX;
-  dragStartY.value = event.pageY;
+  dragStartX.value = props.isNewWidget ? event.clientX : event.pageX;
+  dragStartY.value = props.isNewWidget ? event.clientY : event.pageY;
   isDragging.value = true;
 
   document.addEventListener("mousemove", onDragMove);
@@ -54,8 +59,10 @@ const onDragStart = (event) => {
 };
 
 const onDragMove = (event) => {
-  const offsetX = event.pageX - dragStartX.value;
-  const offsetY = event.pageY - dragStartY.value;
+  const offsetX =
+    (props.isNewWidget ? event.clientX : event.pageX) - dragStartX.value;
+  const offsetY =
+    (props.isNewWidget ? event.clientY : event.pageY) - dragStartY.value;
   widget.value.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 };
 

@@ -50,6 +50,37 @@
       @select="onWidgetSelectorSelect"
       @close="onWidgetSelectorClose"
     />
+    <ConfigDialog
+      v-if="isNewWidgetSelected"
+      :is-placing-widget="isDragging"
+      is-new
+      @close="onNewWidgetConfigClose"
+    >
+      <template #new>
+        <WidgetBase
+          ref="newWidget"
+          :widget-id="addingWidget.id"
+          :widget-theme="addingWidget.theme"
+          is-new-widget
+          :style="`width: ${addingWidget.position.width * cellSize + (addingWidget.position.width - 1) * GAP}px; height: ${addingWidget.position.height * cellSize + (addingWidget.position.height - 1) * GAP}px`"
+          @drag-start="onNewWidgetDragStart"
+          @drag-end="onNewWidgetDragEnd"
+        >
+          <component
+            :is="WIDGET_MAP[addingWidget.type].component"
+            v-model="addingWidget.options"
+          />
+        </WidgetBase>
+      </template>
+      <ConfigSection
+        :title="WIDGET_MAP[addingWidget.type].name"
+        v-model="addingWidget.options"
+      />
+      <div class="flex w-full items-center justify-center">
+        When you're ready, drag the widget onto the dashboard or click the X to
+        cancel.
+      </div>
+    </ConfigDialog>
   </div>
 </template>
 <script setup>
@@ -65,15 +96,32 @@ const WIDGET_MAP = {
     description: "Displays a countdown to an event.",
     component: resolveComponent("Countdown"),
     options: {
-      targetDate: "Date",
-      event: "Text",
+      targetDate: {
+        name: "Target Date",
+        type: "Date",
+      },
+      event: {
+        name: "Event",
+        type: "Text",
+      },
     },
     sizes: [[2, 2]],
   },
 };
 
+const DEFAULT_VALUES = {
+  Text: () => "",
+  Date: () => {
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  },
+  Color: () => "#000000",
+};
+
 const grid = ref(null);
 const shadow = ref(null);
+const newWidget = ref(null);
 
 const widgets = ref([]);
 const cellSize = ref(0);
@@ -83,6 +131,8 @@ const draggingCoords = ref({});
 const cellOccupation = ref(new Map());
 const isThemeConfigOpen = ref(false);
 const isWidgetSelectorOpen = ref(false);
+const isNewWidgetSelected = ref(false);
+const addingWidget = ref({});
 
 const onThemeConfigClick = () => {
   isThemeConfigOpen.value = true;
@@ -96,11 +146,94 @@ const onAddClick = () => {
 };
 
 const onWidgetSelectorSelect = (selected) => {
-  console.log(selected);
+  addingWidget.value = {
+    id: widgets.value.at(-1).id + 1,
+    type: selected,
+    theme: {},
+    options: WIDGET_MAP[selected].options,
+    position: {
+      width: WIDGET_MAP[selected].sizes[0][0],
+      height: WIDGET_MAP[selected].sizes[0][1],
+    },
+  };
+  for (const option of Object.keys(WIDGET_MAP[selected].options)) {
+    addingWidget.value.options[option].value =
+      DEFAULT_VALUES[WIDGET_MAP[selected].options[option].type]();
+  }
+  isNewWidgetSelected.value = true;
 };
 
 const onWidgetSelectorClose = () => {
   isWidgetSelectorOpen.value = false;
+};
+
+const onNewWidgetConfigClose = () => {
+  isNewWidgetSelected.value = false;
+};
+
+const onNewWidgetDragStart = () => {
+  const rect = newWidget.value.$el.getBoundingClientRect();
+  newWidget.value.$el.style.position = "absolute";
+  newWidget.value.$el.style.top = `${rect.top}px`;
+  newWidget.value.$el.style.left = `${rect.left}px`;
+
+  const coords = calcGridCoords(
+    rect.x,
+    rect.y,
+    addingWidget.value.position.width,
+    addingWidget.value.position.height,
+    window.innerWidth,
+  );
+  addingWidget.value.position.x = coords.x;
+  addingWidget.value.position.y = coords.y;
+  draggingWidget.value = JSON.parse(JSON.stringify(addingWidget.value));
+  shadow.value.$el.style.gridColumn = `${draggingWidget.value.position.x} / span ${draggingWidget.value.position.width}`;
+  shadow.value.$el.style.gridRow = `${draggingWidget.value.position.y} / span ${draggingWidget.value.position.height}`;
+
+  isDragging.value = true;
+  document.addEventListener("mousemove", onDragMove);
+};
+
+const onNewWidgetDragEnd = () => {
+  document.removeEventListener("mousemove", onDragMove);
+  clearInterval(scrollInterval);
+  isDragging.value = false;
+
+  let isOccupied = false;
+
+  for (let x = 0; x < draggingWidget.value.position.width; x++) {
+    for (let y = 0; y < draggingWidget.value.position.height; y++) {
+      if (
+        getMapCell(
+          cellOccupation.value,
+          draggingCoords.value.x + x,
+          draggingCoords.value.y + y,
+        )
+      ) {
+        isOccupied = true;
+        break;
+      }
+    }
+  }
+
+  if (!isOccupied) {
+    draggingWidget.value.position.x = draggingCoords.value.x;
+    draggingWidget.value.position.y = draggingCoords.value.y;
+    for (let x = 0; x < draggingWidget.value.position.width; x++) {
+      for (let y = 0; y < draggingWidget.value.position.height; y++) {
+        setMapCell(
+          cellOccupation.value,
+          draggingWidget.value.position.x + x,
+          draggingWidget.value.position.y + y,
+          true,
+        );
+      }
+    }
+    console.log(draggingWidget.value);
+  }
+
+  widgets.value.push(draggingWidget.value);
+  onNewWidgetConfigClose();
 };
 
 const deleteWidget = (widget) => {

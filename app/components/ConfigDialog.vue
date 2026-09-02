@@ -1,6 +1,9 @@
 <template>
-  <Modal>
+  <Modal :disable-backdrop="isPlacingWidget">
+    <slot name="new" />
+    <div v-if="!isPlacingWidget" class="w-4" />
     <div
+      v-if="!isPlacingWidget"
       class="relative flex w-full max-w-2xl flex-col gap-4 rounded-xl border-2 border-(--borderColor) bg-(--widgetBackgroundColor) p-4 text-(--textColor)"
     >
       <Icon
@@ -30,6 +33,7 @@ import { Icon } from "@iconify/vue";
 defineProps({
   isWidget: Boolean,
   isNew: Boolean,
+  isPlacingWidget: Boolean,
 });
 
 const emit = defineEmits(["close", "delete"]);
