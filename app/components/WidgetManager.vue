@@ -229,10 +229,9 @@ const onNewWidgetDragEnd = () => {
         );
       }
     }
-    console.log(draggingWidget.value);
+    widgets.value.push(draggingWidget.value);
   }
 
-  widgets.value.push(draggingWidget.value);
   onNewWidgetConfigClose();
 };
 
