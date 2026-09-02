@@ -147,7 +147,7 @@ const onAddClick = () => {
 
 const onWidgetSelectorSelect = (selected) => {
   addingWidget.value = {
-    id: widgets.value.at(-1).id + 1,
+    id: widgets.value.length > 0 ? widgets.value.at(-1).id + 1 : 1,
     type: selected,
     theme: {},
     options: WIDGET_MAP[selected].options,
