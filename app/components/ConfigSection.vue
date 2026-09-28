@@ -3,11 +3,13 @@
     <h1 class="text-2xl">{{ title }}</h1>
     <hr class="border-t-2 border-(--borderColor)" />
     <ConfigItem
+      v-if="Object.keys(items).length > 0"
       v-for="item in Object.keys(items)"
       :name="items[item].name"
       :type="items[item].type"
       v-model="items[item].value"
     />
+    <p v-else>No options.</p>
   </div>
 </template>
 <script setup>
